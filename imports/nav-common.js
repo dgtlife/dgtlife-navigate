@@ -450,7 +450,7 @@ const registerContentHelpers = (contentHelpers) => {
  */
 export const run = (options) => {
   if (!options) {
-    throw new Error('Nav.run must be called on a config object.');
+    throw new Error('Nav run must be called on a config object.');
   }
 
   // Check the config options.
