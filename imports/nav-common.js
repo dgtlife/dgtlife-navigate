@@ -2,8 +2,6 @@
  * @file Defines the common functions and structures
  * @author Derek Gransaull <derek@dgtlife.com>
  * @copyright DGTLife, LLC 2016
- *
- * Created on 12/14/16
  */
 /* eslint new-cap: ["error", { "capIsNewExceptionPattern": "^Match\.." }] */
 import { ReactiveVar } from 'meteor/reactive-var';

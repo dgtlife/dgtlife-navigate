@@ -2,8 +2,6 @@
  * @file Defines the functions for App Mode
  * @author Derek Gransaull <derek@dgtlife.com>
  * @copyright DGTLife, LLC 2016
- *
- * Created on 12/14/16
  */
 import { Meteor } from 'meteor/meteor';
 import {

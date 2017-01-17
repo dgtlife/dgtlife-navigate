@@ -2,8 +2,6 @@
  * @file Defines the Pattern namespace which holds patterns for Match.
  * @author Derek Gransaull <derek@dgtlife.com>
  * @copyright DGTLife, LLC 2016
- *
- * Created on 12/14/16
  */
  /* eslint new-cap: ["error", { "capIsNewExceptionPattern": "^Match\.." }] */
 import { Match } from 'meteor/check';

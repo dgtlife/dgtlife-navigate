@@ -2,8 +2,6 @@
  * @file Define the dgtlife:navigate package
  * @author Derek Gransaull <derek@dgtlife.com>
  * @copyright DGTLife, LLC 2014
- *
- * Created on 1/15/14
  */
 Package.describe({
   summary: 'Navigate is a simple lightweight navigation package for ' +
