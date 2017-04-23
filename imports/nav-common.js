@@ -294,7 +294,7 @@ const registerNavLink = (name) => {
  * Get the screen object when given the name of the screen.
  * @param {string} name - the name of the screen
  */
-const getScreen = name => _.findWhere(screens, { name: name });
+export const getScreen = name => _.findWhere(screens, { name: name });
 
 /**
  * Register a screen.
