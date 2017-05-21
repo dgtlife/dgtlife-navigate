@@ -1,7 +1,7 @@
 /**
- * @file Defines and exports the Nav object.
+ * @file Defines exports for the Navigate package
  * @author Derek Gransaull <derek@dgtlife.com>
- * @copyright DGTLife, LLC 2016
+ * @copyright DGTLife, LLC 2017
  */
 import {
   registerScreen,

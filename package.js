@@ -1,12 +1,11 @@
 /**
  * @file Define the dgtlife:navigate package
  * @author Derek Gransaull <derek@dgtlife.com>
- * @copyright DGTLife, LLC 2014
+ * @copyright DGTLife, LLC 2017
  */
 Package.describe({
-  summary: 'Navigate is a simple lightweight navigation package for ' +
-           'Meteor-based web apps',
-  version: '0.8.6',
+  summary: 'Navigate is a simple lightweight navigation package for Meteor-based web apps',
+  version: '0.8.7',
   name: 'dgtlife:navigate',
   git: ''
 });

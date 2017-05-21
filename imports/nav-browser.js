@@ -284,10 +284,10 @@ export const updateBrowserHistory =
        * This is a parameterized path. Construct the pathname by using the
        * path mask and the parameters provided.
        */
-      const _path = generatePath(pathMask, params);
+      const parameterizedPath = generatePath(pathMask, params);
 
       // Push the state, document.title, and path into browser history.
-      window.history.pushState(screenState, document.title, _path);
+      window.history.pushState(screenState, document.title, parameterizedPath);
     } else {
       /*
        * This is a literal path. Push the state, document.title, and path into

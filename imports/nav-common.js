@@ -136,19 +136,16 @@ export const toScreen = (name, options) => {
   // Check the name first.
   check(name, Pattern.nonEmptyString);
 
-  // Avoid errors when this function is called with no options.
-  // const _options = options || {};
+  // If we are already on that screen, return.
+  if (currentScreen.get() === name) {
+    return false;
+  }
 
   // Get the screen object.
   const screen = _.findWhere(screens, { name: name });
 
   // If the screen exists,
   if (screen) {
-    // ... and we are already on that screen, ignore early and return.
-    if (currentScreen.get() === name) {
-      return false;
-    }
-
     // Check the optional options ;-).
     if (options) {
       check(options, {
@@ -176,9 +173,9 @@ export const toScreen = (name, options) => {
     }
 
     // Set any screen data for this (soon to be current) screen.
-    const _screenData = options && options.screenData;
-    if (_screenData) {
-      screenData.set(_screenData);
+    // const _screenData = options && options.screenData;
+    if (options && options.screenData) {
+      screenData.set(options.screenData);
     }
 
     // Run any screen-specific 'before' function.
@@ -246,7 +243,12 @@ export const toScreen = (name, options) => {
     // Update the browser history, unless it's explicitly prevented.
     if (shouldUpdateBrowserHistory) {
       updateBrowserHistory(
-        name, screen.path, screen.pathMask, screen.generatePath, screenData);
+        name,
+        screen.path,
+        screen.pathMask,
+        screen.generatePath,
+        screenData.get()
+      );
     }
 
     // Assign a shouldUpdateNavStack variable.
@@ -261,7 +263,7 @@ export const toScreen = (name, options) => {
 
     // Update the navigation stack, unless it's explicitly prevented.
     if (shouldUpdateNavStack) {
-      updateNavStack(name, screen.title, screenData);
+      updateNavStack(name, screen.title, screenData.get());
     }
   } else {
     throw new Error(`A screen named ${name} has not been registered.`);
@@ -520,7 +522,7 @@ export const run = (options) => {
  *                                      definition
  * @param {function} func - the name or definition of the function that waits
  * @param {boolean} showLoading - TRUE to show the Loading screen
- * @param {object} context - a data context that may be needed
+ * @param {object} [context] - a data context that may be needed
  */
 export const waitForCondition = (condition, func, showLoading, context) => {
   let conditionSatisfied;
