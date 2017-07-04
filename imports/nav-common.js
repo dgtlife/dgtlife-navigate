@@ -192,7 +192,6 @@ export const toScreen = (name, options) => {
         // Set the screen title.
         const title = screen.title;
         if (_.isFunction(title)) {
-          // Consider using 'this.autorun'
           this.autorun((comp) => {
             if (title()) {
               document.title = title();
