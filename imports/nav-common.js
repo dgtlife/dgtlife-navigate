@@ -106,7 +106,7 @@ export const pathLookup = [];
 export const currentScreen = new ReactiveVar(null);
 export const screenData = new ReactiveVar({});
 export const navStackLength = new ReactiveVar(0);
-export const isLoading = new ReactiveVar(false);
+export const isComputing = new ReactiveVar(false);
 const reactive = new ReactiveDict();
 
 /**
@@ -520,10 +520,9 @@ export const run = (options) => {
  *                                      function name, or a function
  *                                      definition
  * @param {function} func - the name or definition of the function that waits
- * @param {boolean} showLoading - TRUE to show the Loading screen
  * @param {object} [context] - a data context that may be needed
  */
-export const waitForCondition = (condition, func, showLoading, context) => {
+export const waitForCondition = (condition, func, context) => {
   let conditionSatisfied;
 
   /**
@@ -533,16 +532,19 @@ export const waitForCondition = (condition, func, showLoading, context) => {
    * @returns {boolean}
    */
   const evaluateConditions = () =>
-    _.every(config.conditionsToWaitFor[condition], conditionFunc =>
-      !((conditionFunc() === false) || (_.isUndefined(conditionFunc()))));
+    _.every(
+      config.conditionsToWaitFor[condition],
+      conditionFunc => !(
+        (conditionFunc() === false) || (_.isUndefined(conditionFunc()))
+      )
+    );
 
   // Check for proper inputs.
   check(condition, Pattern.nonEmptyStringOrFunction);
   check(func, Pattern.function);
-  check(showLoading, Boolean);
 
   // Context may not be a plain object.
-  if (!_.isUndefined(context)) {
+  if (context) {
     check(context, Match.Where(val => _.isObject(val)));
   }
 
@@ -559,15 +561,10 @@ export const waitForCondition = (condition, func, showLoading, context) => {
 
   Tracker.autorun((comp) => {
     if (!conditionSatisfied()) {
-      if (showLoading) {
-        // Show the 'Loading' screen, and set the 'Loading' state.
-        isLoading.set(true);
-        reactive.set(config.contentHelpers[0], 'loading');
-      }
+      // Set the 'Computing' state.
+      isComputing.set(true);
     } else {
-      if (showLoading) {
-        isLoading.set(false);
-      }
+      isComputing.set(false);
 
       /*
        * Call the function that waits for the condition to be TRUE, passing

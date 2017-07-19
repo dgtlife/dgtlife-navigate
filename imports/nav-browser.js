@@ -52,10 +52,13 @@ export const loadTargetScreenInBrowserMode = (screenSpec) => {
        * The current screen is the requested one, so we are reloading. Wait on
        * any relevant conditions, but do not update the browser history.
        */
-      waitForCondition('okToReload', () => {
-        _.extend(options, { shouldUpdateBrowserHistory: false });
-        toScreen(name, options);
-      }, true);
+      waitForCondition(
+        'okToReload',
+        () => {
+          _.extend(options, { shouldUpdateBrowserHistory: false });
+          toScreen(name, options);
+        }
+      );
     } else {
       // Go to this new screen.
       toScreen(name, options);
@@ -65,9 +68,12 @@ export const loadTargetScreenInBrowserMode = (screenSpec) => {
      * This is likely a first load in a new window or tab, so go to this
      * screen, after any relevant conditions are ready.
      */
-    waitForCondition('okToLoad', () => {
-      toScreen(name, options);
-    }, true);
+    waitForCondition(
+      'okToLoad',
+      () => {
+        toScreen(name, options);
+      }
+    );
   }
 };
 
@@ -113,10 +119,13 @@ const isScreenAllowed = (screenSpec) => {
         applyAccessControl(screen, isAllowed());
       } else {
         // The user object is not ready, so wait for it, ...
-        waitForCondition(Meteor.user, () => {
-          // ... then evaluate the function.
-          applyAccessControl(screen, isAllowed());
-        }, true);
+        waitForCondition(
+          Meteor.user,
+          () => {
+            // ... then evaluate the function.
+            applyAccessControl(screen, isAllowed());
+          }
+        );
       }
     } else {
       // It's not a user session, so proceed.

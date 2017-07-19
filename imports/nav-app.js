@@ -29,17 +29,26 @@ export const startAppMode = (publicHome, userHome) => {
     // We are loading (for the first time).
     if (Meteor.userId && Meteor.userId()) {
       // It's a user session, but wait for the user object to be ready.
-      waitForCondition(Meteor.user, () => {
-        // Wait for any other conditions to be ready.
-        waitForCondition('okToLoad', () => {
-          toScreen(userHome);
-        }, true);
-      }, true);
+      waitForCondition(
+        Meteor.user,
+        () => {
+          // Wait for any other conditions to be ready.
+          waitForCondition(
+            'okToLoad',
+            () => {
+              toScreen(userHome);
+            }
+          );
+        }
+      );
     } else {
       // It's not a user session, so just wait for any other conditions.
-      waitForCondition('okToLoad', () => {
-        toScreen(publicHome);
-      }, true);
+      waitForCondition(
+        'okToLoad',
+        () => {
+          toScreen(publicHome);
+        }
+      );
     }
   } else {
     // It's an app reload, so go to the screen at the top of the navStack??

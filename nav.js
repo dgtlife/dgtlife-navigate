@@ -11,7 +11,7 @@ import {
   getScreen,
   screenData,
   navStackLength,
-  isLoading,
+  isComputing,
   toHome,
   getPreviousTitle,
   back
@@ -26,7 +26,7 @@ export {
   getScreen,
   screenData,
   navStackLength,
-  isLoading,
+  isComputing,
   toHome,
   getPreviousTitle,
   back,
