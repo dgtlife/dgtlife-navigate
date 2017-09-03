@@ -173,7 +173,6 @@ export const toScreen = (name, options) => {
     }
 
     // Set any screen data for this (soon to be current) screen.
-    // const _screenData = options && options.screenData;
     if (options && options.screenData) {
       screenData.set(options.screenData);
     }
@@ -182,37 +181,6 @@ export const toScreen = (name, options) => {
     if (screen.before) {
       screen.before();
     }
-
-    /*
-     * Define an onRendered callback to set the window title, and run global
-     * and screen-specific 'after' functions.
-     */
-    Template[screen.contentHelperMap[0].template].onRendered(
-      function onRenderedScreen() {
-        // Set the screen title.
-        const title = screen.title;
-        if (_.isFunction(title)) {
-          this.autorun((comp) => {
-            if (title()) {
-              document.title = title();
-              comp.stop();
-            }
-          });
-        } else {
-          document.title = title;
-        }
-
-        // Run any screen-specific 'after' function
-        if (screen.after) {
-          screen.after();
-        }
-
-        // Run any global 'after' function.
-        if (config.afterScreens) {
-          config.afterScreens();
-        }
-      }
-    );
 
     /*
      * "Go" to the screen, by setting the value of the reactive variable for
@@ -437,6 +405,45 @@ const registerContentHelpers = (contentHelpers) => {
 };
 
 /**
+ * Defines an onRendered callback for each registered screen to run the global
+ * and screen-specific 'after' functions, and to set the window/tab title.
+ * @param {Function} afterScreens - the afterScreens function
+ */
+const registerOnRenderedCallbacks = (afterScreens) => {
+  _.each(
+    screens,
+    (screen) => {
+      Template[screen.contentHelperMap[0].template].onRendered(
+        function onRenderedScreen() {
+          // Set the screen title.
+          const title = screen.title;
+          if (_.isFunction(title)) {
+            this.autorun((comp) => {
+              if (title()) {
+                document.title = title();
+                comp.stop();
+              }
+            });
+          } else {
+            document.title = title;
+          }
+
+          // Run any screen-specific 'after' function
+          if (screen.after) {
+            screen.after();
+          }
+
+          // Run any global 'after' function.
+          if (afterScreens) {
+            afterScreens();
+          }
+        }
+      );
+    }
+  );
+};
+
+/**
  * Start a navigation session, i.e. start navigation in one of the following
  * modes:
  *   * app mode
@@ -482,6 +489,11 @@ export const run = (options) => {
 
   // Register the content helpers.
   registerContentHelpers(config.contentHelpers);
+
+  // Register onRendered callbacks that run afterScreens (and other) function.
+  if (options.afterScreens) {
+    registerOnRenderedCallbacks(options.afterScreens);
+  }
 
   // Branch based on mode.
   if (inAppMode()) {
