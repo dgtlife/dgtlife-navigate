@@ -78,7 +78,10 @@ export const config = {
   beforeScreens: null,
 
   // A function that runs after each and every screen is rendered.
-  afterScreens: null,
+  onRenderScreens: null,
+
+  // A function that runs upon leaving each and every screen.
+  onDestroyScreens: null,
 
   /*
    * An object in which each key is an array of functions. Each function
@@ -115,9 +118,12 @@ const reactive = new ReactiveDict();
  */
 const setConfig = (options) => {
   // Update the config values.
-  _.each(options, (value, key) => {
-    config[key] = value;
-  });
+  _.each(
+    options,
+    (value, key) => {
+      config[key] = value;
+    }
+  );
 };
 
 /**
@@ -292,7 +298,7 @@ export const getScreen = name => _.findWhere(screens, { name: name });
  *     'beforeScreens'
  *   * after {function} - a function to run after this screen is rendered;
  *     this function will run before any function stored in
- *     'afterScreens'
+ *     'onRenderScreens'
  *
  * The 'title', and 'isAllowed' properties require the input
  * of the type indicated, or a function that returns the required type.
@@ -322,7 +328,6 @@ export const registerScreen = (name, options) => {
   check(options.getDataFromParams, Match.Optional(Pattern.function));
   check(options.isAllowed, Match.Optional(Pattern.booleanOrFunction));
   check(options.before, Match.Optional(Pattern.function));
-  check(options.after, Match.Optional(Pattern.function));
 
   // Check that all path-related options are provided.
   if (options.path && !options.pathPattern) {
@@ -405,40 +410,43 @@ const registerContentHelpers = (contentHelpers) => {
 };
 
 /**
- * Defines an onRendered callback for each registered screen to run the global
- * and screen-specific 'after' functions, and to set the window/tab title.
- * @param {Function} afterScreens - the afterScreens function
+ * Defines an onRendered and/or an onDestroyed callback for each registered
+ * screen to run the global onRenderScreens and onDestroyScreens functions. The
+ * onRendered callback also sets the window/tab title.
+ * @param {Function} onRenderScreens - the onRenderScreens function
+ * @param {Function} onDestroyScreens - the onDestroyScreens function
  */
-const registerOnRenderedCallbacks = (afterScreens) => {
+const registerTemplateCallbacks = (onRenderScreens, onDestroyScreens) => {
   _.each(
     screens,
     (screen) => {
-      Template[screen.contentHelperMap[0].template].onRendered(
-        function onRenderedScreen() {
-          // Set the screen title.
-          const title = screen.title;
-          if (_.isFunction(title)) {
-            this.autorun((comp) => {
-              if (title()) {
-                document.title = title();
-                comp.stop();
-              }
-            });
-          } else {
-            document.title = title;
-          }
+      if (onRenderScreens) {
+        Template[screen.contentHelperMap[0].template].onRendered(
+          function onRenderedScreen() {
+            // Set the screen title.
+            const title = screen.title;
+            if (_.isFunction(title)) {
+              this.autorun((comp) => {
+                if (title()) {
+                  document.title = title();
+                  comp.stop();
+                }
+              });
+            } else {
+              document.title = title;
+            }
 
-          // Run any screen-specific 'after' function
-          if (screen.after) {
-            screen.after();
+            // Run any global 'after' function.
+            onRenderScreens();
           }
+        );
+      }
 
-          // Run any global 'after' function.
-          if (afterScreens) {
-            afterScreens();
-          }
-        }
-      );
+      if (onDestroyScreens) {
+        Template[screen.contentHelperMap[0].template].onDestroyed(
+          onDestroyScreens
+        );
+      }
     }
   );
 };
@@ -471,7 +479,8 @@ export const run = (options) => {
   check(options.notFoundTemplate, Match.Optional(String));
   check(options.accessDeniedTemplate, Match.Optional(String));
   check(options.beforeScreens, Match.Optional(Pattern.function));
-  check(options.afterScreens, Match.Optional(Pattern.function));
+  check(options.onRenderScreens, Match.Optional(Pattern.function));
+  check(options.onDestroyScreens, Match.Optional(Pattern.function));
   check(options.conditionsToWaitFor, Match.Optional(Object));
   if (options.conditionsToWaitFor) {
     check(options.conditionsToWaitFor.okToLoad, Match.Optional(Array));
@@ -490,10 +499,8 @@ export const run = (options) => {
   // Register the content helpers.
   registerContentHelpers(config.contentHelpers);
 
-  // Register onRendered callbacks that run afterScreens (and other) function.
-  if (options.afterScreens) {
-    registerOnRenderedCallbacks(options.afterScreens);
-  }
+  // Register screen template callbacks.
+  registerTemplateCallbacks(options.onRenderScreens, options.onDestroyScreens);
 
   // Branch based on mode.
   if (inAppMode()) {
